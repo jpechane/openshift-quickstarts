@@ -22,6 +22,7 @@ import javax.ejb.MessageDriven;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.jms.ObjectMessage;
 import javax.jms.TextMessage;
 
 /**
@@ -44,11 +45,11 @@ public class HelloWorldQueueMDB implements MessageListener {
      * @see MessageListener#onMessage(Message)
      */
     public void onMessage(Message rcvMessage) {
-        TextMessage msg = null;
+    	ObjectMessage msg = null;
         try {
-            if (rcvMessage instanceof TextMessage) {
-                msg = (TextMessage) rcvMessage;
-                LOGGER.info("Received Message from queue: " + msg.getText());
+            if (rcvMessage instanceof ObjectMessage) {
+                msg = (ObjectMessage) rcvMessage;
+                LOGGER.info("Received Message from queue: " + msg.getObject());
             } else {
                 LOGGER.warning("Message of wrong type: " + rcvMessage.getClass().getName());
             }
