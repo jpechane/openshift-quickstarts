@@ -25,6 +25,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
@@ -34,6 +35,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.jboss.as.quickstarts.mdb.domain.Message;
 
 /**
  * <p>
@@ -83,11 +86,21 @@ public class HelloWorldMDBServletClient extends HttpServlet {
             MessageProducer messageProducer = session.createProducer(destination);
             connection.start();
             out.write("<h2>Following messages will be send to the destination:</h2>");
-            TextMessage message = session.createTextMessage();
-            for (int i = 0; i < MSG_COUNT; i++) {
-                message.setText("This is message " + (i + 1));
-                messageProducer.send(message);
-                out.write("Message (" + i + "): " + message.getText() + "</br>");
+            if (destination == topic) {
+	            TextMessage message = session.createTextMessage();
+	            for (int i = 0; i < MSG_COUNT; i++) {
+	                message.setText("This is message " + (i + 1));
+	                messageProducer.send(message);
+	                out.write("Message (" + i + "): " + message.getText() + "</br>");
+	            }
+            }
+            else {
+	            final ObjectMessage message = session.createObjectMessage();
+	            for (int i = 0; i < MSG_COUNT; i++) {
+	                message.setObject(new Message("Order: " + i, "This is message " + (i + 1)));
+	                messageProducer.send(message);
+	                out.write("Message (" + i + "): " + message.getObject() + "</br>");
+	            }
             }
             out.write("<p><i>Go to your JBoss EAP server console or log to see the result of messages processing</i></p>");
 
